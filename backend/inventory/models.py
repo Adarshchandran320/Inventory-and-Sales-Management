@@ -134,7 +134,3 @@ class SaleItem(models.Model):
                 condition=Q(unit_price__gte=0), name="saleitem_unit_price_gte_0"
             ),
         ]
-
-    @property
-    def subtotal(self):
-        return self.quantity * self.unit_price
