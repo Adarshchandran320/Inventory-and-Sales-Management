@@ -121,6 +121,9 @@ class SaleItem(models.Model):
     )
     quantity = models.PositiveIntegerField()
     unit_price = models.DecimalField(max_digits=12, decimal_places=2)  # Rule 8: snapshot
+    subtotal = models.DecimalField(
+        max_digits=14, decimal_places=2, default=Decimal("0.00")
+    )  # set by backend, never by client
 
     class Meta:
         constraints = [
