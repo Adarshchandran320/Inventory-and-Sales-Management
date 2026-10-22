@@ -3,6 +3,7 @@ export default function ConfirmDelete({
   title = 'Are you sure?',
   message,
   confirmLabel = 'Delete',
+  confirmClass = 'btn-danger',
   onConfirm,
   onCancel,
 }) {
@@ -22,7 +23,7 @@ export default function ConfirmDelete({
               <button className="btn btn-secondary" onClick={onCancel}>
                 Cancel
               </button>
-              <button className="btn btn-danger" onClick={onConfirm}>
+              <button className={`btn ${confirmClass}`} onClick={onConfirm}>
                 {confirmLabel}
               </button>
             </div>
