@@ -1,4 +1,3 @@
-
 from django.db import transaction
 from django.db.models import F, Q
 from django.shortcuts import get_object_or_404
@@ -18,23 +17,26 @@ from .serializers import (
 
 
 class SupplierViewSet(viewsets.ModelViewSet):
-    queryset = Supplier.objects.all().order_by("company_name")
     serializer_class = SupplierSerializer
+
+    def get_queryset(self):
+        qs = Supplier.objects.all().order_by("company_name")
+        search = self.request.query_params.get("search")
+        if search:
+            qs = qs.filter(
+                Q(company_name__icontains=search)
+                | Q(contact_person__icontains=search)
+                | Q(email__icontains=search)
+            )
+        return qs
 
     def destroy(self, request, *args, **kwargs):
         supplier = self.get_object()
-
         if supplier.products.exists() or supplier.purchase_orders.exists():
             return Response(
-                {
-                    "detail": (
-                        "Supplier has products or purchase history "
-                        "and cannot be deleted."
-                    )
-                },
+                {"detail": "Supplier has products or purchase history and cannot be deleted."},
                 status=status.HTTP_409_CONFLICT,
             )
-
         return super().destroy(request, *args, **kwargs)
 
 
@@ -66,6 +68,10 @@ class ProductViewSet(viewsets.ModelViewSet):
             qs = qs.filter(
                 stock_quantity__lte=F("reorder_level")
             )
+
+        supplier = params.get("supplier")
+        if supplier:
+            qs = qs.filter(supplier_id=supplier)
 
         return qs
 
